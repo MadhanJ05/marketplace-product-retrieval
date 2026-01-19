@@ -1,0 +1,166 @@
+# =============================================================================
+# Wholesale Product Retrieval - Configuration
+# =============================================================================
+
+project:
+  name: "wholesale-product-retrieval"
+  version: "1.0.0"
+  author: "Madhan Jothimani"
+
+# -----------------------------------------------------------------------------
+# Data Settings
+# -----------------------------------------------------------------------------
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  
+  # ESCI dataset
+  esci:
+    source: "tasksource/esci"  # Hugging Face dataset ID
+    locale: "us"               # Filter to US-English only
+  
+  # Train/Val/Test split ratios
+  splits:
+    train: 0.70
+    val: 0.15
+    test: 0.15
+  
+  # Relevance label mapping (ESCI → numeric)
+  label_map:
+    E: 3  # Exact
+    S: 2  # Substitute
+    C: 1  # Complement
+    I: 0  # Irrelevant
+
+# -----------------------------------------------------------------------------
+# Wholesale Augmentation
+# -----------------------------------------------------------------------------
+augmentation:
+  enabled: true
+  ratio: 0.25              # Augment 25% of queries
+  augmentations_per_query: 2
+  
+  templates:
+    wholesale:
+      - "{query} bulk"
+      - "{query} wholesale"
+      - "{query} bulk pack"
+      - "{query} case pack"
+      - "{query} wholesale lot"
+      - "bulk {query}"
+      - "wholesale {query}"
+      - "{query} for resale"
+      - "{query} retail pack"
+      - "{query} multi pack"
+    
+    quantity:
+      - "{query} set of 6"
+      - "{query} set of 12"
+      - "{query} pack of 24"
+      - "{query} 50 count"
+      - "{query} 100 pack"
+  
+  quantity_probability: 0.3  # 30% chance to add quantity signal
+
+# -----------------------------------------------------------------------------
+# Query Understanding (LLM)
+# -----------------------------------------------------------------------------
+query_understanding:
+  model_name: "google/flan-t5-base"  # Can upgrade to flan-t5-large
+  max_input_length: 256
+  max_output_length: 150
+  device: "cpu"  # Change to "cuda" if GPU available
+  
+  # Caching for repeated queries
+  cache_enabled: true
+  cache_dir: "data/cache/query_understanding"
+
+# -----------------------------------------------------------------------------
+# Retrieval Settings
+# -----------------------------------------------------------------------------
+retrieval:
+  # BM25 settings
+  bm25:
+    k1: 1.5
+    b: 0.75
+    top_k: 100
+  
+  # Dense retrieval settings
+  dense:
+    model_name: "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_dim: 384
+    top_k: 100
+    batch_size: 64
+    
+    # FAISS index settings
+    faiss:
+      index_type: "IndexFlatIP"  # Inner product (cosine after normalization)
+      nlist: 100                  # For IVF index (if used)
+  
+  # Hybrid fusion
+  fusion:
+    method: "rrf"  # Reciprocal Rank Fusion
+    rrf_k: 60      # RRF parameter
+    top_k: 100     # Candidates after fusion
+
+# -----------------------------------------------------------------------------
+# Reranking Settings
+# -----------------------------------------------------------------------------
+reranking:
+  model_type: "xgboost"  # Options: "xgboost", "cross_encoder"
+  
+  xgboost:
+    objective: "rank:ndcg"
+    max_depth: 6
+    learning_rate: 0.1
+    n_estimators: 100
+    early_stopping_rounds: 10
+  
+  cross_encoder:
+    model_name: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    batch_size: 32
+  
+  # Features for LTR
+  features:
+    - bm25_score
+    - dense_score
+    - query_product_category_match
+    - attribute_overlap
+    - title_length
+    - has_brand
+    - has_description
+
+# -----------------------------------------------------------------------------
+# Evaluation Settings
+# -----------------------------------------------------------------------------
+evaluation:
+  metrics:
+    - ndcg@10
+    - mrr@10
+    - recall@50
+    - precision@10
+  
+  # Latency tracking
+  track_latency: true
+  latency_percentiles: [50, 95, 99]
+
+# -----------------------------------------------------------------------------
+# Demo App Settings
+# -----------------------------------------------------------------------------
+demo:
+  host: "localhost"
+  port: 8501
+  title: "Wholesale Product Search"
+  results_per_page: 10
+
+# -----------------------------------------------------------------------------
+# Logging
+# -----------------------------------------------------------------------------
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# -----------------------------------------------------------------------------
+# Random Seeds (for reproducibility)
+# -----------------------------------------------------------------------------
+seed: 42

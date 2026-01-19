@@ -1,0 +1,779 @@
+{
+  "aa99b9e2492ab3ccca25f05e21625e92": {
+    "product_type": "coffee mugs",
+    "attributes": [],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "mugs",
+      "cups",
+      "drinkware",
+      "tea mugs",
+      "ceramic mugs"
+    ]
+  },
+  "eda804d417b3ba9e2a8ba29dd24aa796": {
+    "product_type": "running shoes",
+    "attributes": [
+      "nike"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "athletic footwear",
+      "sneakers",
+      "trainers",
+      "jogging shoes",
+      "performance shoes"
+    ]
+  },
+  "b76b52e8f00e2490565c5b9bcfd09357": {
+    "product_type": "candles",
+    "attributes": [
+      "scented"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "fragrant candles",
+      "aromatic candles",
+      "scented wax melts",
+      "essential oil candles",
+      "home fragrance"
+    ]
+  },
+  "858e1e3351a8aabdcc71efb7ef17ea64": {
+    "product_type": "mugs",
+    "attributes": [
+      "blue",
+      "ceramic",
+      "minimalist"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "cups",
+      "drinkware",
+      "tea mugs",
+      "modern mugs",
+      "simple mugs"
+    ]
+  },
+  "f9730ab26673ed82ded60c0c67e99f7e": {
+    "product_type": "t-shirts",
+    "attributes": [
+      "organic cotton",
+      "black"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "tees",
+      "cotton tops",
+      "apparel",
+      "basic tees",
+      "plain t-shirts"
+    ]
+  },
+  "1589be42a7f354838f1ff7ac5d221124": {
+    "product_type": "wallet",
+    "attributes": [
+      "leather",
+      "men",
+      "brown"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "cardholder",
+      "bifold wallet",
+      "trifold wallet",
+      "money clip",
+      "mens accessories"
+    ]
+  },
+  "9cb7e9dc06aae6922bb35b3e549f28af": {
+    "product_type": "mugs",
+    "attributes": [
+      "ceramic"
+    ],
+    "quantity_signal": "bulk",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "cups",
+      "drinkware",
+      "tea mugs",
+      "mug set",
+      "wholesale mugs"
+    ]
+  },
+  "499a711e31d3c4c3e62a4f40f5f1e213": {
+    "product_type": "candles",
+    "attributes": [
+      "lavender"
+    ],
+    "quantity_signal": "wholesale",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "scented candles",
+      "aromatic candles",
+      "fragrance candles",
+      "home fragrance",
+      "wax melts"
+    ]
+  },
+  "d325f80d914905c1c0e3ef6ea7a2547a": {
+    "product_type": "tote bags",
+    "attributes": [],
+    "quantity_signal": "pack of 50",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "canvas bags",
+      "shopping bags",
+      "grocery bags",
+      "reusable bags",
+      "carryalls"
+    ]
+  },
+  "da50c78bb1a37aae119c9ec781cf4d6d": {
+    "product_type": "greeting cards",
+    "attributes": [],
+    "quantity_signal": "case pack",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "bulk greeting cards",
+      "wholesale stationery",
+      "boxed cards",
+      "card packs for retailers",
+      "bulk stationery"
+    ]
+  },
+  "240b8e4e5b5429743c29f7335b0de98e": {
+    "product_type": "cap",
+    "attributes": [
+      "boston celtics",
+      "adjustable"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "hat",
+      "baseball cap",
+      "snapback",
+      "strapback",
+      "headwear"
+    ]
+  },
+  "coffee mugs": {
+    "product_type": "mugs",
+    "attributes": [
+      "coffee"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "cups",
+      "mug",
+      "ceramic mugs",
+      "beverage mugs",
+      "coffee cups"
+    ]
+  },
+  "running shoes nike": {
+    "product_type": "shoes",
+    "attributes": [
+      "running",
+      "nike"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "athletic shoes",
+      "sneakers",
+      "nike running shoes",
+      "gym shoes",
+      "training shoes"
+    ]
+  },
+  "scented candles": {
+    "product_type": "candles",
+    "attributes": [
+      "scented"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "aroma candles",
+      "fragrance candles",
+      "home fragrance",
+      "diffuser candles"
+    ]
+  },
+  "blue ceramic mugs minimalist": {
+    "product_type": "mugs",
+    "attributes": [
+      "blue",
+      "ceramic",
+      "minimalist"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "white mugs",
+      "ceramic coffee mugs",
+      "simple mugs",
+      "designer mugs",
+      "modern mugs"
+    ]
+  },
+  "organic cotton t-shirts black": {
+    "product_type": "t-shirts",
+    "attributes": [
+      "organic cotton",
+      "black"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "cotton shirts",
+      "organic apparel",
+      "black tees",
+      "eco friendly clothing",
+      "cotton tops"
+    ]
+  },
+  "leather wallet men brown": {
+    "product_type": "wallets",
+    "attributes": [
+      "leather",
+      "men",
+      "brown"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "men's wallets",
+      "leather card holders",
+      "brown leather accessories",
+      "men's leather goods",
+      "wallets for men"
+    ]
+  },
+  "ceramic mugs bulk": {
+    "product_type": "mugs",
+    "attributes": [
+      "ceramic"
+    ],
+    "quantity_signal": "bulk",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "porcelain mugs",
+      "white mugs",
+      "custom mugs",
+      "ceramic coffee mugs",
+      "tableware"
+    ]
+  },
+  "wholesale candles lavender": {
+    "product_type": "candles",
+    "attributes": [
+      "lavender"
+    ],
+    "quantity_signal": "wholesale",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "essential oil candles",
+      "scented candles",
+      "aromatherapy candles",
+      "votive candles",
+      "diffuser candles"
+    ]
+  },
+  "tote bags pack of 50": {
+    "product_type": "tote bags",
+    "attributes": [
+      "pack of 50"
+    ],
+    "quantity_signal": "pack of 50",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "canvas bags",
+      "beach bags",
+      "shopping bags"
+    ]
+  },
+  "greeting cards case pack for resale": {
+    "product_type": "greeting cards",
+    "attributes": [
+      "case pack"
+    ],
+    "quantity_signal": "case pack for resale",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "cards for resale",
+      "greeting cards wholesale",
+      "bulk greeting cards",
+      "cards in bulk",
+      "resale cards"
+    ]
+  },
+  "boston celtics cap adjustable": {
+    "product_type": "caps",
+    "attributes": [
+      "adjustable",
+      "boston celtics"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "baseball caps",
+      "hats",
+      "nba apparel",
+      "sports caps",
+      "adjustable hats"
+    ]
+  },
+  "gifts for mom birthday": {
+    "product_type": "gifts",
+    "attributes": [
+      "birthday",
+      "mom"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "birthday presents",
+      "mom gifts",
+      "gifts for mom",
+      "mother's day gifts",
+      "personalized gifts"
+    ]
+  },
+  "kitchen utensils bamboo eco friendly set": {
+    "product_type": "kitchen utensils",
+    "attributes": [
+      "bamboo",
+      "eco friendly"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "kitchen tools",
+      "eco kitchenware",
+      "sustainable utensils",
+      "bamboo kitchenware",
+      "eco friendly kitchen utensils"
+    ]
+  },
+  "nike running shoes wholesale": {
+    "product_type": "running shoes",
+    "attributes": [
+      "nike",
+      "wholesale"
+    ],
+    "quantity_signal": "wholesale",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "athletic shoes",
+      "sneakers",
+      "running gear",
+      "shoe wholesale",
+      "nike shoes"
+    ]
+  },
+  "organic candles lavender": {
+    "product_type": "candles",
+    "attributes": [
+      "organic",
+      "lavender"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "scented candles",
+      "essential oil candles",
+      "natural candles",
+      "aromatherapy candles",
+      "soy wax candles"
+    ]
+  },
+  "oneplus 7t wholesale lot": {
+    "product_type": "phones",
+    "attributes": [
+      "oneplus",
+      "7t"
+    ],
+    "quantity_signal": "wholesale lot",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "oneplus phones",
+      "android phones",
+      "smartphones",
+      "mobile phones"
+    ]
+  },
+  "the andrews sisters": {
+    "product_type": "music",
+    "attributes": [
+      "vintage",
+      "classic",
+      "female"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "vintage music",
+      "classic female singers",
+      "jazz music",
+      "vintage jazz",
+      "female vocalists"
+    ]
+  },
+  "led light bulbs 60w soft white": {
+    "product_type": "light bulbs",
+    "attributes": [
+      "led",
+      "60w",
+      "soft white"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "energy efficient bulbs",
+      "warm white bulbs",
+      "led lighting",
+      "bulbs 60w",
+      "soft glow bulbs"
+    ]
+  },
+  "bulk table top resin": {
+    "product_type": "table top resin",
+    "attributes": [
+      "resin"
+    ],
+    "quantity_signal": "bulk",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "resin art",
+      "table decor",
+      "home decor resin"
+    ]
+  },
+  "truck roof tent": {
+    "product_type": "roof tents",
+    "attributes": [
+      "truck",
+      "roof"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "camping gear",
+      "overlanding",
+      "off-grid",
+      "outdoor shelter"
+    ]
+  },
+  "lazy susan turntable": {
+    "product_type": "lazy susan",
+    "attributes": [
+      "turntable"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "rotating tray",
+      "spinning turntable",
+      "revolving dish",
+      "dish turntable",
+      "rotating dish"
+    ]
+  },
+  "leather chair covers": {
+    "product_type": "chair covers",
+    "attributes": [
+      "leather"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "furniture covers",
+      "leather furniture protectors",
+      "chair slipcovers",
+      "leather chair accessories"
+    ]
+  },
+  "bulk 1+folder+3+hole+punched+pocket+folder smead black": {
+    "product_type": "pocket folders",
+    "attributes": [
+      "black",
+      "Smead",
+      "punched",
+      "3 hole"
+    ],
+    "quantity_signal": "bulk",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "file folders",
+      "pocket organizers",
+      "office supplies",
+      "punched folders",
+      "Smead products"
+    ]
+  },
+  "lantern pendant light bulk pack": {
+    "product_type": "lantern pendant light",
+    "attributes": [
+      "bulk",
+      "pack"
+    ],
+    "quantity_signal": "bulk",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "pendant lights",
+      "lantern lighting",
+      "bulk lighting fixtures",
+      "industrial lighting",
+      "commercial lighting"
+    ]
+  },
+  "pizza pan with holes with citter": {
+    "product_type": "pizza pans",
+    "attributes": [
+      "with holes",
+      "copper"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "pizza cookware",
+      "copper cookware",
+      "pizza baking pans",
+      "copper pans"
+    ]
+  },
+  "handheld fan": {
+    "product_type": "fans",
+    "attributes": [
+      "handheld"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "portable fans",
+      "personal fans",
+      "mini fans",
+      "portable cooling fans",
+      "portable ventilation fans"
+    ]
+  },
+  "samsung headphones wholesale lot": {
+    "product_type": "headphones",
+    "attributes": [
+      "samsung"
+    ],
+    "quantity_signal": "wholesale lot",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "wireless headphones",
+      "earbuds",
+      "audio accessories",
+      "electronics",
+      "wireless earbuds"
+    ]
+  },
+  "she's not there by jennifer finney boylan": {
+    "product_type": null,
+    "attributes": null,
+    "quantity_signal": null,
+    "intent": null,
+    "expanded_terms": [
+      "memoir",
+      "biography",
+      "nonfiction",
+      "book",
+      "memoirs"
+    ]
+  },
+  "enyzme": {
+    "product_type": "enzymes",
+    "attributes": [],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "biological catalysts",
+      "biochemicals",
+      "proteins",
+      "biocatalysts"
+    ]
+  },
+  "copper stone necklace bulk pack": {
+    "product_type": "necklaces",
+    "attributes": [
+      "copper",
+      "stone"
+    ],
+    "quantity_signal": "bulk pack",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "jewelry",
+      "accessories",
+      "copper jewelry",
+      "stone necklaces",
+      "bulk jewelry pack"
+    ]
+  },
+  "ray winstone": {
+    "product_type": null,
+    "attributes": null,
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "ray winston sunglasses",
+      "ray ban",
+      "eyewear",
+      "sunglasses",
+      "eyeglasses"
+    ]
+  },
+  "mother of the bride dresses for women long": {
+    "product_type": "dresses",
+    "attributes": [
+      "long",
+      "mother of the bride"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "wedding guest dresses",
+      "special occasion dresses",
+      "mother of the bride outfits",
+      "long formal dresses",
+      "wedding dresses"
+    ]
+  },
+  "wholesale tiki torch fuel": {
+    "product_type": "tiki torch fuel",
+    "attributes": [
+      "wholesale"
+    ],
+    "quantity_signal": "wholesale",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "torch fuel",
+      "tiki torch accessories",
+      "outdoor lighting fuel"
+    ]
+  },
+  "braiding hair 4": {
+    "product_type": "hair accessories",
+    "attributes": [
+      "braiding",
+      "hair"
+    ],
+    "quantity_signal": "4",
+    "intent": "product_search",
+    "expanded_terms": [
+      "hair extensions",
+      "hair ties",
+      "hair clips",
+      "hair wefts"
+    ]
+  },
+  "paddletech pickleball paddle": {
+    "product_type": "paddles",
+    "attributes": [
+      "pickleball",
+      "Paddletech"
+    ],
+    "quantity_signal": null,
+    "intent": "product_search",
+    "expanded_terms": [
+      "pickleball equipment",
+      "pickleball paddles",
+      "Paddletech products",
+      "pickleball accessories",
+      "pickleball gear"
+    ]
+  },
+  "laptop case for microsoft surface laptop 3 bulk pack": {
+    "product_type": "laptop case",
+    "attributes": [
+      "microsoft surface",
+      "laptop 3"
+    ],
+    "quantity_signal": "bulk pack",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "laptop sleeve",
+      "surface laptop case",
+      "laptop bag",
+      "microsoft surface accessories",
+      "laptop protection"
+    ]
+  },
+  "resistance bands exercise manual retail pack": {
+    "product_type": "resistance bands",
+    "attributes": [
+      "exercise",
+      "manual",
+      "retail pack"
+    ],
+    "quantity_signal": "retail pack",
+    "intent": "product_search",
+    "expanded_terms": [
+      "fitness bands",
+      "exercise equipment",
+      "workout accessories",
+      "physical therapy tools",
+      "stretching bands"
+    ]
+  },
+  "lego technic sets cars tranprter wholesale lot": {
+    "product_type": "Lego sets",
+    "attributes": [
+      "Technic",
+      "cars",
+      "transporter"
+    ],
+    "quantity_signal": "wholesale lot",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "Lego Technic",
+      "Lego cars",
+      "Lego building sets",
+      "Lego construction sets",
+      "Lego toys"
+    ]
+  },
+  "pixel 4 wholesale": {
+    "product_type": "phones",
+    "attributes": [
+      "pixel 4"
+    ],
+    "quantity_signal": "wholesale",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "google pixel 4",
+      "android phones",
+      "smartphones",
+      "pixel 4a",
+      "google pixel"
+    ]
+  },
+  "painting nail stickers pack of 24": {
+    "product_type": "nail stickers",
+    "attributes": [
+      "painting",
+      "pack of 24"
+    ],
+    "quantity_signal": "pack of 24",
+    "intent": "wholesale_purchase",
+    "expanded_terms": [
+      "nail art",
+      "nail wraps",
+      "stickers for nails",
+      "nail decorations"
+    ]
+  }
+}
