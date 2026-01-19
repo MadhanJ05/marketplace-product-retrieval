@@ -1,383 +1,222 @@
 """
-Reranking Module
-Uses XGBoost LambdaMART-style ranker to reorder search results.
+CrossEncoder Reranker for Wholesale Product Retrieval.
+
+Supports multiple models:
+- cross-encoder/ms-marco-MiniLM-L-12-v2 (default, balanced)
+- cross-encoder/ms-marco-MiniLM-L-6-v2 (faster)
+- BAAI/bge-reranker-base (best quality, slower)
 """
 
-import pickle
+from typing import List, Dict, Optional
+from sentence_transformers import CrossEncoder
 import numpy as np
-import pandas as pd
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
-from sklearn.preprocessing import LabelEncoder
-import xgboost as xgb
+import pickle
 
 
-class FeatureExtractor:
-    """Extract features for reranking."""
+class CrossEncoderReranker:
+    """Reranker using CrossEncoder models."""
     
-    def __init__(self, product_df: pd.DataFrame):
-        """
-        Args:
-            product_df: DataFrame with product information
-        """
-        self.product_lookup = product_df.set_index('product_id').to_dict('index')
-        
-    def extract_features(
-        self,
-        query: str,
-        results: List[Dict],
-        query_analysis: Optional[Dict] = None
-    ) -> np.ndarray:
-        """
-        Extract features for each query-product pair.
-        
-        Features:
-        1. BM25 score (normalized)
-        2. FAISS score (normalized)
-        3. Source flags (bm25_only, faiss_only, both)
-        4. Rank from BM25
-        5. Rank from FAISS
-        6. Title length
-        7. Query-title word overlap
-        8. Has brand match
-        9. Intent match (wholesale signal in product)
-        
-        Returns:
-            np.ndarray of shape (n_results, n_features)
-        """
-        features = []
-        
-        query_tokens = set(query.lower().split())
-        is_wholesale_query = any(w in query.lower() for w in ['bulk', 'wholesale', 'pack', 'case'])
-        
-        for rank, result in enumerate(results):
-            product = self.product_lookup.get(result['product_id'], {})
-            product_title = str(product.get('product_title', '')).lower()
-            product_brand = str(product.get('product_brand', '')).lower()
-            
-            title_tokens = set(product_title.split())
-            
-            # Feature extraction
-            feat = []
-            
-            # 1. Hybrid score
-            feat.append(result.get('score', 0))
-            
-            # 2. Rank position (normalized)
-            feat.append(1.0 / (rank + 1))
-            
-            # 3-4. Source flags
-            sources = result.get('sources', [])
-            feat.append(1.0 if 'bm25' in sources else 0.0)
-            feat.append(1.0 if 'faiss' in sources else 0.0)
-            
-            # 5. Both sources (stronger signal)
-            feat.append(1.0 if ('bm25' in sources and 'faiss' in sources) else 0.0)
-            
-            # 6. Title length (normalized)
-            feat.append(min(len(product_title) / 200.0, 1.0))
-            
-            # 7. Query-title word overlap (Jaccard-ish)
-            overlap = len(query_tokens & title_tokens)
-            feat.append(overlap / max(len(query_tokens), 1))
-            
-            # 8. Query coverage (what % of query words are in title)
-            coverage = overlap / max(len(query_tokens), 1)
-            feat.append(coverage)
-            
-            # 9. Brand in query
-            brand_match = 1.0 if product_brand and product_brand in query.lower() else 0.0
-            feat.append(brand_match)
-            
-            # 10. Wholesale signal match
-            product_has_bulk = any(w in product_title for w in ['bulk', 'pack', 'set of', 'wholesale', 'case'])
-            wholesale_match = 1.0 if (is_wholesale_query and product_has_bulk) else 0.0
-            feat.append(wholesale_match)
-            
-            # 11. Price indicator (has $ or price-like patterns)
-            has_price = 1.0 if '$' in product_title or 'oz' in product_title else 0.0
-            feat.append(has_price)
-            
-            # 12. Product completeness (has description, brand, etc.)
-            completeness = sum([
-                1 if product.get('product_brand') else 0,
-                1 if product.get('product_description') else 0,
-                1 if product.get('product_bullet_point') else 0,
-            ]) / 3.0
-            feat.append(completeness)
-            
-            features.append(feat)
-        
-        return np.array(features, dtype=np.float32)
-    
-    @property
-    def feature_names(self) -> List[str]:
-        return [
-            'hybrid_score',
-            'rank_score',
-            'has_bm25',
-            'has_faiss',
-            'has_both',
-            'title_length',
-            'word_overlap',
-            'query_coverage',
-            'brand_match',
-            'wholesale_match',
-            'has_price_indicator',
-            'product_completeness'
-        ]
-
-
-class Reranker:
-    """XGBoost-based reranker using LambdaMART objective."""
+    # Available models
+    MODELS = {
+        "balanced": "cross-encoder/ms-marco-MiniLM-L-12-v2",
+        "fast": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        "quality": "BAAI/bge-reranker-base",
+    }
     
     def __init__(
         self,
-        model_path: Optional[str] = None,
-        product_df: Optional[pd.DataFrame] = None
+        model_name: str = "cross-encoder/ms-marco-MiniLM-L-12-v2",
+        device: Optional[str] = None
     ):
         """
-        Args:
-            model_path: Path to saved model (optional)
-            product_df: Product DataFrame for feature extraction
-        """
-        self.model = None
-        self.feature_extractor = None
-        
-        if product_df is not None:
-            self.feature_extractor = FeatureExtractor(product_df)
-        
-        if model_path and Path(model_path).exists():
-            self.load(model_path)
-    
-    def train(
-        self,
-        train_data: List[Dict],
-        val_data: Optional[List[Dict]] = None,
-        params: Optional[Dict] = None
-    ):
-        """
-        Train the reranker.
+        Initialize the reranker.
         
         Args:
-            train_data: List of {'query', 'results', 'labels', 'query_analysis'}
-            val_data: Optional validation data in same format
-            params: XGBoost parameters
+            model_name: Model name or shortcut ("balanced", "fast", "quality")
+            device: "cpu", "cuda", or None (auto-detect)
         """
-        if params is None:
-            params = {
-                'objective': 'rank:ndcg',
-                'learning_rate': 0.1,
-                'max_depth': 6,
-                'n_estimators': 100,
-                'subsample': 0.8,
-                'colsample_bytree': 0.8,
-                'random_state': 42,
-                'n_jobs': -1
-            }
+        # Allow shortcuts
+        if model_name in self.MODELS:
+            model_name = self.MODELS[model_name]
         
-        # Prepare training data
-        X_train, y_train, groups_train = self._prepare_data(train_data)
-        
-        print(f"Training data: {X_train.shape[0]} samples, {len(groups_train)} queries")
-        
-        # Create model
-        self.model = xgb.XGBRanker(**params)
-        
-        # Train
-        if val_data:
-            X_val, y_val, groups_val = self._prepare_data(val_data)
-            self.model.fit(
-                X_train, y_train,
-                group=groups_train,
-                eval_set=[(X_val, y_val)],
-                eval_group=[groups_val],
-                verbose=True
-            )
-        else:
-            self.model.fit(X_train, y_train, group=groups_train, verbose=True)
-        
-        print("✓ Reranker trained")
-        
-        # Feature importance
-        self._print_feature_importance()
+        self.model_name = model_name
+        self.model = CrossEncoder(model_name, device=device)
+        print(f"✓ Loaded CrossEncoder: {model_name}")
     
-    def _prepare_data(
-        self,
-        data: List[Dict]
-    ) -> Tuple[np.ndarray, np.ndarray, List[int]]:
-        """Prepare data for XGBoost ranker."""
-        X_list = []
-        y_list = []
-        groups = []
-        
-        for item in data:
-            query = item['query']
-            results = item['results']
-            labels = item['labels']
-            query_analysis = item.get('query_analysis')
-            
-            if len(results) == 0:
-                continue
-            
-            # Extract features
-            features = self.feature_extractor.extract_features(
-                query, results, query_analysis
-            )
-            
-            X_list.append(features)
-            y_list.extend(labels)
-            groups.append(len(results))
-        
-        X = np.vstack(X_list)
-        y = np.array(y_list, dtype=np.float32)
-        
-        return X, y, groups
+    # Wholesale/bulk quantity signals
+    BULK_KEYWORDS = [
+        "set of 6", "set of 8", "set of 12", "set of 24",
+        "pack of", "case of", "dozen", "bulk", "wholesale",
+        "6 pack", "12 pack", "24 pack", "multipack", "multi-pack"
+    ]
     
-    def _print_feature_importance(self):
-        """Print feature importance."""
-        if self.model is None:
-            return
-        
-        importance = self.model.feature_importances_
-        names = self.feature_extractor.feature_names
-        
-        print("\nFeature Importance:")
-        print("-" * 40)
-        for name, imp in sorted(zip(names, importance), key=lambda x: -x[1]):
-            print(f"  {name}: {imp:.4f}")
+    def _is_bulk_query(self, query: str) -> bool:
+        """Check if query has wholesale/bulk intent."""
+        bulk_signals = ["bulk", "wholesale", "case", "pack", "set of", "dozen"]
+        query_lower = query.lower()
+        return any(signal in query_lower for signal in bulk_signals)
+    
+    def _get_bulk_boost(self, title: str) -> float:
+        """Calculate bulk boost based on product title."""
+        title_lower = title.lower()
+        for kw in self.BULK_KEYWORDS:
+            if kw in title_lower:
+                return 0.5
+        return 0.0
     
     def rerank(
         self,
         query: str,
         results: List[Dict],
-        query_analysis: Optional[Dict] = None,
-        top_k: Optional[int] = None
+        top_k: Optional[int] = None,
+        text_field: str = "product_title",
+        apply_bulk_boost: bool = True
     ) -> List[Dict]:
         """
-        Rerank search results.
+        Rerank search results using CrossEncoder.
         
         Args:
             query: Search query
-            results: List of search results from hybrid retriever
-            query_analysis: Optional query analysis from QueryUnderstanding
-            top_k: Number of results to return (default: all)
+            results: List of search results with product info
+            top_k: Number of results to return (None = all)
+            text_field: Field to use for reranking
+            apply_bulk_boost: Whether to boost bulk products for bulk queries
         
         Returns:
-            Reranked results with updated scores
+            Reranked results with scores
         """
-        if len(results) == 0:
-            return results
+        if not results:
+            return []
         
-        if self.model is None:
-            # No model trained, return original order
-            return results[:top_k] if top_k else results
+        # Check if this is a bulk query
+        is_bulk_query = self._is_bulk_query(query) if apply_bulk_boost else False
         
-        # Extract features
-        features = self.feature_extractor.extract_features(
-            query, results, query_analysis
-        )
+        # Build query-document pairs
+        pairs = []
+        for r in results:
+            text = r.get(text_field, "")
+            if not text and "product" in r:
+                text = r["product"].get(text_field, "")
+            pairs.append([query, str(text)])
         
-        # Predict scores
-        scores = self.model.predict(features)
+        # Score all pairs
+        scores = self.model.predict(pairs)
         
-        # Sort by predicted score
-        sorted_indices = np.argsort(scores)[::-1]
-        
+        # Add scores and sort
         reranked = []
-        for new_rank, old_idx in enumerate(sorted_indices):
-            result = results[old_idx].copy()
-            result['rerank_score'] = float(scores[old_idx])
-            result['original_rank'] = old_idx + 1
-            result['new_rank'] = new_rank + 1
-            reranked.append(result)
+        for i, (result, score) in enumerate(zip(results, scores)):
+            result_copy = result.copy()
+            
+            # Base score from CrossEncoder
+            final_score = float(score)
+            result_copy["crossencoder_score"] = final_score
+            
+            # Apply bulk boost if bulk query
+            bulk_boost = 0.0
+            if is_bulk_query:
+                title = result_copy.get(text_field, "")
+                if not title and "product" in result_copy:
+                    title = result_copy["product"].get(text_field, "")
+                bulk_boost = self._get_bulk_boost(title)
+                final_score += bulk_boost
+            
+            result_copy["bulk_boost"] = bulk_boost
+            result_copy["rerank_score"] = final_score
+            result_copy["original_rank"] = i + 1
+            reranked.append(result_copy)
+        
+        # Sort by rerank score (descending)
+        reranked.sort(key=lambda x: x["rerank_score"], reverse=True)
+        
+        # Add new rank
+        for i, r in enumerate(reranked):
+            r["new_rank"] = i + 1
         
         return reranked[:top_k] if top_k else reranked
     
-    def save(self, path: str):
-        """Save model to disk."""
-        path = Path(path)
-        path.parent.mkdir(parents=True, exist_ok=True)
+    def rerank_batch(
+        self,
+        queries: List[str],
+        results_batch: List[List[Dict]],
+        top_k: Optional[int] = None,
+        text_field: str = "product_title"
+    ) -> List[List[Dict]]:
+        """
+        Rerank multiple queries efficiently.
         
-        with open(path, 'wb') as f:
-            pickle.dump({
-                'model': self.model,
-                'feature_names': self.feature_extractor.feature_names if self.feature_extractor else None
-            }, f)
-        print(f"✓ Model saved to {path}")
+        Args:
+            queries: List of search queries
+            results_batch: List of result lists
+            top_k: Number of results per query
+            text_field: Field to use for reranking
+        
+        Returns:
+            List of reranked results
+        """
+        return [
+            self.rerank(q, r, top_k, text_field)
+            for q, r in zip(queries, results_batch)
+        ]
     
-    def load(self, path: str):
-        """Load model from disk."""
-        with open(path, 'rb') as f:
-            data = pickle.load(f)
-        self.model = data['model']
-        print(f"✓ Model loaded from {path}")
+    def compare_rankings(
+        self,
+        query: str,
+        results: List[Dict],
+        top_k: int = 10,
+        text_field: str = "product_title"
+    ) -> Dict:
+        """
+        Show before/after comparison for analysis.
+        
+        Args:
+            query: Search query
+            results: Original results
+            top_k: Number to compare
+            text_field: Field for display
+        
+        Returns:
+            Comparison dict with before/after
+        """
+        reranked = self.rerank(query, results, top_k, text_field)
+        
+        before = []
+        after = []
+        
+        for i, r in enumerate(results[:top_k]):
+            text = r.get(text_field, "")
+            if not text and "product" in r:
+                text = r["product"].get(text_field, "")
+            before.append(f"{i+1}. {text[:60]}")
+        
+        for r in reranked:
+            text = r.get(text_field, "")
+            if not text and "product" in r:
+                text = r["product"].get(text_field, "")
+            move = r["original_rank"] - r["new_rank"]
+            arrow = "↑" if move > 0 else "↓" if move < 0 else "="
+            after.append(f"{r['new_rank']}. {text[:50]} {arrow}{abs(move)}")
+        
+        return {
+            "query": query,
+            "before": before,
+            "after": after
+        }
 
 
-def create_training_data_from_labels(
-    labels_df: pd.DataFrame,
-    retriever,
-    query_understanding=None,
-    max_queries: int = 1000,
-    candidates_per_query: int = 50
-) -> List[Dict]:
+# Convenience function
+def load_reranker(
+    model: str = "balanced",
+    device: Optional[str] = None
+) -> CrossEncoderReranker:
     """
-    Create training data from labeled query-product pairs.
+    Load a reranker with preset.
     
     Args:
-        labels_df: DataFrame with 'query', 'product_id', 'label' columns
-                   Labels: E=3 (Exact), S=2 (Substitute), C=1 (Complement), I=0 (Irrelevant)
-        retriever: HybridRetriever instance
-        query_understanding: QueryUnderstanding instance (optional)
-        max_queries: Maximum number of queries to use
-        candidates_per_query: Number of candidates to retrieve per query
+        model: "balanced", "fast", "quality", or full model name
+        device: "cpu", "cuda", or None
     
     Returns:
-        List of training examples
+        CrossEncoderReranker instance
     """
-    # Label mapping
-    label_map = {'E': 3, 'S': 2, 'C': 1, 'I': 0}
-    
-    # Get unique queries
-    queries = labels_df['query'].unique()[:max_queries]
-    
-    training_data = []
-    
-    for query in queries:
-        # Get labeled products for this query
-        query_labels = labels_df[labels_df['query'] == query]
-        label_dict = dict(zip(query_labels['product_id'], query_labels['esci_label']))
-        
-        # Get query analysis if available
-        query_analysis = None
-        if query_understanding:
-            query_analysis = query_understanding.analyze(query)
-        
-        # Retrieve candidates
-        results = retriever.search(query, method="hybrid", top_k=candidates_per_query)
-        
-        if len(results) == 0:
-            continue
-        
-        # Assign labels to results
-        labels = []
-        for r in results:
-            pid = r['product_id']
-            if pid in label_dict:
-                labels.append(label_map.get(label_dict[pid], 0))
-            else:
-                labels.append(0)  # Unknown = irrelevant
-        
-        training_data.append({
-            'query': query,
-            'results': results,
-            'labels': labels,
-            'query_analysis': query_analysis
-        })
-    
-    return training_data
-
-
-# Quick test
-if __name__ == "__main__":
-    print("Reranker module loaded successfully")
+    return CrossEncoderReranker(model_name=model, device=device)
