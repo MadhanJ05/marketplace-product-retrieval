@@ -46,10 +46,19 @@ class CrossEncoderReranker:
     
     # Wholesale/bulk quantity signals
     BULK_KEYWORDS = [
-        "set of 6", "set of 8", "set of 12", "set of 24",
-        "pack of", "case of", "dozen", "bulk", "wholesale",
-        "6 pack", "12 pack", "24 pack", "multipack", "multi-pack"
-    ]
+    # Set patterns (more inclusive)
+    "set of", "gift set", "set -", "set,", "sets,",
+    # Pack patterns  
+    "pack of", "pack,", "pack ", "8 pack", "6 pack", "4 pack", "12 pack", "24 pack", 
+    "multipack", "multi-pack",
+    # Case/bulk patterns
+    "case of", "dozen", "bulk", "wholesale",
+    # Count patterns
+    "2 count", "4 count", "6 count", "8 count", "12 count",
+    # Quantity in title patterns
+    "2 pcs", "4 pcs", "6 pcs", "8 pcs", "set of 2", "set of 4", "set of 6", 
+    "set of 8", "set of 12", "set of 24",
+]
     
     def _is_bulk_query(self, query: str) -> bool:
         """Check if query has wholesale/bulk intent."""
